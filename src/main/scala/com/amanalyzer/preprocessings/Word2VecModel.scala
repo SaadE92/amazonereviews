@@ -1,10 +1,11 @@
 package com.amanalyzer.preprocessings
 
-import com.amanalyzer.repository.{AppContextInitializer, ResourcesContextInitilatizer}
+import com.amanalyzer.repository.{AppContextInitializer, ResourcesContextInitilatizer, Review}
 import org.apache.spark.mllib.feature.Word2VecModel
-import org.apache.spark.mllib.linalg.{Vectors, Vector}
+import org.apache.spark.mllib.linalg.{Vector, Vectors}
 import AppContextInitializer.sparkSession.implicits._
 import com.amanalyzer.utils.VectoOperations
+import scala.math
 
 /**
   * Word2Vec Companion object that returns a Singleton instance of Word2VecModel
@@ -25,13 +26,19 @@ object Word2VecModelCompanion{
 class W2VecModel extends Serializable {
 
   def saveWord2Vec()= {
-    val rawData = ResourcesContextInitilatizer.getReviewsData.groupBy("asin")
-    val resultDF = rawData.max("overall").join(ResourcesContextInitilatizer.getReviewsData.select("asin", "reviewText", "overall"), "asin")
+    val persistedRawData = ResourcesContextInitilatizer.getReviewsDataAsReviewsRDD
+    val pairPersistedRawData = persistedRawData.map(review => (review.asin, review)).persist()
+    val rawData = pairPersistedRawData.reduceByKey(getMaxByOverall)
+    val resultDF = rawData.join(pairPersistedRawData)
     import org.apache.spark.mllib.feature.{Word2Vec}
     val word2vec = new Word2Vec()
-    val reviewsText = resultDF.select("reviewText").map(line => line.mkString.split(" ").toSeq).toJavaRDD
+    val reviewsText = pairPersistedRawData.mapValues(review => review.reviewText.split(" ").toSeq).values
     val model = word2vec.fit(reviewsText)
     model.save(AppContextInitializer.sparkContext, ".")
+  }
+
+  private def getMaxByOverall = (rev1 : Review, rev2 : Review) => {
+    if(rev1.overall > rev2.overall) rev1 else rev2
   }
 
   // Reads Word2VecModel

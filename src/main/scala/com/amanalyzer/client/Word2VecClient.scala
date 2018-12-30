@@ -18,7 +18,7 @@ object Word2VecClient {
 
     val vectorDim = 100
 
-    val removedSWTokenizedData = ReviewStopWordsRemoverCompanion.reviewStopWordsRemover.remover.transform(ReviewTokenizerCompanion.reviewTokenizer.regexTokenizer.transform(ResourcesContextInitilatizer.getReviewsData))
+    val removedSWTokenizedData = ReviewStopWordsRemoverCompanion.reviewStopWordsRemover.remover.transform(ReviewTokenizerCompanion.reviewTokenizer.regexTokenizer.transform(ResourcesContextInitilatizer.getReviewsDataAsReviewsRDD.toDS()))
 
     def textVectorUdf (reviewText:Seq[String]) : Vector = Word2VecModelCompanion.word2VecModel.textVectors(reviewText,vectorDim)
 
