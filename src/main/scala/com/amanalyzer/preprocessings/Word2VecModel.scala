@@ -35,7 +35,7 @@ class W2VecModel extends Serializable {
   }
 
   // Reads Word2VecModel
-  val w2vModel = Word2VecModel.load(AppContextInitializer.sparkContext, "w2vModel")
+  val w2vModel = Word2VecModel.load(AppContextInitializer.sparkContext, "${path_to_your_generated_w2vModel}w2vModel")
 
   // Gets serializable Map[String, Array[Float]]
   val vectors = w2vModel.getVectors.mapValues(vv => Vectors.dense(vv.map(_.toDouble))).map(identity)

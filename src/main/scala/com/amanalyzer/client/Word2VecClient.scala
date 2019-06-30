@@ -20,8 +20,6 @@ object Word2VecClient {
 
     val removedSWTokenizedData = ReviewStopWordsRemoverCompanion.reviewStopWordsRemover.remover.transform(ReviewTokenizerCompanion.reviewTokenizer.regexTokenizer.transform(ResourcesContextInitilatizer.getReviewsDataAsReviewsRDD))
 
-    removedSWTokenizedData.rdd.saveAsTextFile("raw")
-
     def textVectorUdf (reviewText:Seq[String]) : Vector = Word2VecModelCompanion.word2VecModel.textVectors(reviewText,vectorDim)
 
     val vectorRepresentationsUDF = udf(textVectorUdf _)
@@ -33,7 +31,6 @@ object Word2VecClient {
         case _ => Vectors.zeros(100)
     }
 
-    vectorsRepresentation.saveAsTextFile("result")
     AmazonReviewsKMeansCompanion.amazonReviewsKMeans.clusterWordsVectors(vectorsRepresentation, Word2VecModelCompanion.word2VecModel.w2vModel)
   }
 }

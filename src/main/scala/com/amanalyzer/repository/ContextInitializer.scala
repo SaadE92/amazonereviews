@@ -28,6 +28,6 @@ object ResourcesContextInitilatizer {
   val getFileLines = (fileName : String) => Source.fromInputStream(getFileStream(fileName)).getLines
 
   def getReviewsDataAsReviewsRDD: DataFrame = {
-    AppContextInitializer.sparkSession.read.json("/Users/saaderrazi/Downloads/Movies_and_TV_5.json").cache()
+    AppContextInitializer.sparkSession.read.json("${path_to_json_reviews_data}/Movies_and_TV_5.json").cache()
   }
 }
