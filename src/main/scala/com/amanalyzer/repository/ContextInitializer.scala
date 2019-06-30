@@ -1,8 +1,6 @@
 package com.amanalyzer.repository
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.apache.spark.rdd.RDD
-import org.apache.spark.sql.{Dataset, Row, SparkSession}
+import org.apache.spark.sql.{DataFrame, SparkSession}
 import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.io.Source
@@ -29,14 +27,7 @@ object ResourcesContextInitilatizer {
 
   val getFileLines = (fileName : String) => Source.fromInputStream(getFileStream(fileName)).getLines
 
-  def getReviewsDataAsReviewsRDD: RDD[Review] = {
-    val objectMapper : ObjectMapper = new ObjectMapper()
-    val json = AppContextInitializer.sparkContext.textFile("/Users/saaderrazi/Downloads/Movies_and_TV_5.json").cache
-    json.flatMap(record => {
-      try {
-        Some(objectMapper.readValue(record, classOf[Review]))
-      } catch {
-        case e: Exception => None
-      }})
+  def getReviewsDataAsReviewsRDD: DataFrame = {
+    AppContextInitializer.sparkSession.read.json("/Users/saaderrazi/Downloads/Movies_and_TV_5.json").cache()
   }
 }

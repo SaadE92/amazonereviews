@@ -5,6 +5,11 @@ import org.apache.spark.mllib.feature.Word2VecModel
 import org.apache.spark.mllib.linalg.Vector
 import org.apache.spark.rdd.RDD
 
+
+object AmazonReviewsKMeansCompanion {
+  val amazonReviewsKMeans : AmazonReviewsKMeans = new AmazonReviewsKMeans(5,100)
+}
+
 /**
   * Amazon Reviews Class that clusters reveiws text
   * @param nbClusters
@@ -21,5 +26,4 @@ class AmazonReviewsKMeans(val nbClusters: Int, val nbIterations: Int) {
       println()
     })
   }
-
 }
